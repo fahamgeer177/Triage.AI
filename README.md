@@ -4,7 +4,7 @@
 
 Built for the Internet of Agents Hackathon @ Solana Skyline
 
-![Triage.AI Screenshot](https://via.placeholder.com/800x400/3b82f6/ffffff?text=Triage.AI+Dashboard)
+![Triage.AI](Triage.AI.png)
 
 ## 🎯 Project Overview
 
