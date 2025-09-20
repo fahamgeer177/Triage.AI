@@ -1,0 +1,17 @@
+# Railway Deployment Configuration
+# This file will be automatically detected by Railway.app
+
+[build]
+  builder = "nixpacks"
+
+[deploy]
+  startCommand = "npm start"
+  healthcheckPath = "/health"
+  restartPolicyType = "always"
+
+[env]
+  NODE_ENV = "production"
+  PORT = "$PORT"
+  
+# Railway will automatically set PORT environment variable
+# Make sure to use process.env.PORT in your application

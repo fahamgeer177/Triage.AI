@@ -1,0 +1,36 @@
+{
+  "name": "triage-ai",
+  "version": "1.0.0",
+  "description": "AI-powered GitHub issue triage system using Coral Protocol",
+  "private": true,
+  "workspaces": [
+    "triage-agent",
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "install-all": "npm install && npm run install:agent && npm run install:backend && npm run install:frontend",
+    "install:agent": "cd triage-agent && npm install",
+    "install:backend": "cd backend && npm install",
+    "install:frontend": "cd frontend && npm install",
+    "dev:agent": "cd triage-agent && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "start:agent": "cd triage-agent && npm start",
+    "start:backend": "cd backend && npm start",
+    "build:frontend": "cd frontend && npm run build",
+    "coral:register": "cd triage-agent && coral agent register"
+  },
+  "keywords": [
+    "coral-protocol",
+    "ai",
+    "github",
+    "triage",
+    "hackathon"
+  ],
+  "author": "Triage.AI Team",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

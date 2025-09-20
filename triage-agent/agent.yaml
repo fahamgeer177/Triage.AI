@@ -1,0 +1,152 @@
+name: triage-agent
+version: "1.0.0"
+description: "AI-powered GitHub issue triage agent for the Coral Protocol ecosystem"
+author: "Triage.AI Team"
+license: "MIT"
+tags:
+  - "github"
+  - "triage" 
+  - "ai"
+  - "issue-management"
+  - "automation"
+
+# Agent runtime configuration
+runtime:
+  type: "http"
+  port: 3001
+  host: "localhost"
+
+# API endpoints
+endpoints:
+  health:
+    method: "GET"
+    path: "/health"
+    description: "Health check endpoint"
+    
+  metadata:
+    method: "GET" 
+    path: "/metadata"
+    description: "Agent metadata and schema information"
+    
+  analyze:
+    method: "POST"
+    path: "/analyze"
+    description: "Analyze GitHub issue and provide triage recommendations"
+
+# Input/Output Schema
+schema:
+  input:
+    type: "object"
+    properties:
+      title:
+        type: "string"
+        description: "GitHub issue title"
+        example: "Application crashes when saving data"
+      body:
+        type: "string"
+        description: "GitHub issue description/body"
+        example: "Detailed description of the issue..."
+      comments:
+        type: "array"
+        items:
+          type: "string"
+        description: "Optional array of issue comments"
+        default: []
+      labels:
+        type: "array"
+        items:
+          type: "string"
+        description: "Existing issue labels"
+        default: []
+      repository:
+        type: "string"
+        description: "Repository name (owner/repo format)"
+        example: "octocat/hello-world"
+    required:
+      - "title"
+      - "body"
+
+  output:
+    type: "object"
+    properties:
+      priority:
+        type: "string"
+        enum: ["low", "medium", "high", "critical"]
+        description: "Recommended priority level"
+      severity:
+        type: "string"
+        enum: ["minor", "moderate", "major", "critical"]
+        description: "Issue severity assessment"
+      suggested_labels:
+        type: "array"
+        items:
+          type: "string"
+        description: "Recommended labels for the issue"
+      summary:
+        type: "string"
+        description: "Brief summary of the issue (1-2 sentences)"
+      next_steps:
+        type: "array"
+        items:
+          type: "string"
+        description: "Recommended next steps and actions"
+      confidence:
+        type: "number"
+        minimum: 0
+        maximum: 1
+        description: "Confidence score of the analysis (0-1)"
+      reasoning:
+        type: "string"
+        description: "Explanation of the triage decision"
+      timestamp:
+        type: "string"
+        format: "date-time"
+        description: "Analysis timestamp"
+      agent_version:
+        type: "string"
+        description: "Version of the agent that performed the analysis"
+
+# Dependencies and requirements
+dependencies:
+  - "node >= 18.0.0"
+  - "npm >= 8.0.0"
+
+environment_variables:
+  OPENAI_API_KEY:
+    description: "OpenAI API key for AI analysis"
+    required: true
+    type: "string"
+  AGENT_PORT:
+    description: "Port for the agent server"
+    required: false
+    default: 3001
+    type: "number"
+
+# Coral Protocol specific metadata
+coral:
+  registry_compatible: true
+  supports_streaming: false
+  stateless: true
+  concurrent_requests: 10
+  
+# Usage examples
+examples:
+  - name: "Bug Report Analysis"
+    input:
+      title: "Login form validation error"
+      body: "The login form shows incorrect error messages when email format is invalid"
+      repository: "myapp/frontend"
+    expected_output:
+      priority: "medium"
+      severity: "moderate"
+      suggested_labels: ["bug", "frontend", "validation"]
+
+  - name: "Critical Issue Analysis"  
+    input:
+      title: "Database connection pool exhausted"
+      body: "Production server cannot connect to database, causing 500 errors for all users"
+      repository: "myapp/backend"
+    expected_output:
+      priority: "critical"
+      severity: "critical"
+      suggested_labels: ["bug", "critical", "database", "production"]

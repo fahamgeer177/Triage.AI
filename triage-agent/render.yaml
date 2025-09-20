@@ -1,0 +1,19 @@
+# Render.com deployment configuration
+version: 2
+
+services:
+  - type: web
+    name: triage-agent
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: OPENAI_API_KEY
+        sync: false  # Set this in Render dashboard
+    scaling:
+      minInstances: 1
+      maxInstances: 1
