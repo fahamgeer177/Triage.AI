@@ -438,46 +438,6 @@ EXPOSE 3001
 CMD ["npm", "start"]
 ```
 
-## 🎯 Demo Script (5-minute presentation)
-
-### Setup (1 minute)
-
-1. Show project structure and architecture
-2. Highlight Coral Protocol integration
-3. Display environment configuration
-
-### Live Demo (3 minutes)
-
-1. **Start services**: Show all 3 running (agent, backend, frontend)
-2. **Connect repository**: Enter `facebook/react` or popular repo
-3. **Browse issues**: Show real GitHub issues loading
-4. **Select issue**: Pick interesting bug or feature request
-5. **Run analysis**: Click triage button, show AI thinking
-6. **Show results**: Highlight priority, severity, suggestions
-
-### Technical Deep Dive (1 minute)
-
-1. **Coral metadata**: Show agent.yaml and /metadata endpoint
-2. **AI integration**: Demonstrate OpenAI analysis logic
-3. **Registration**: Show Coral registry commands
-
-## 🏆 Hackathon Highlights
-
-### What Makes This Special
-
-1. **Complete Coral Integration**: Full agent lifecycle with metadata and registry support
-2. **Production Ready**: Error handling, testing, documentation
-3. **Beautiful UI**: Polished React dashboard with real-time features
-4. **Extensible Architecture**: Easy to add new analysis features
-5. **AI-Powered**: Real OpenAI analysis with fallback handling
-
-### Innovation Points
-
-- **Multi-modal Analysis**: Processes title, body, comments, and labels
-- **Confidence Scoring**: Provides transparency in AI decisions
-- **Real-time Status**: Live connection monitoring
-- **Batch Processing**: Supports analyzing multiple issues
-- **Fallback Logic**: Works even when AI service is unavailable
 
 ## 📝 License
 
