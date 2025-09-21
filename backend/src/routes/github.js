@@ -10,6 +10,74 @@ const getOctokit = () => {
   });
 };
 
+// ✅ Temporary handler for old query-style route
+router.get('/issues', async (req, res) => {
+  try {
+    const repo = req.query.repo;
+    if (!repo) return res.status(400).json({ error: 'Missing repo query' });
+
+    // Split owner/repo
+    const [owner, repoName] = repo.split('/');
+    if (!owner || !repoName) {
+      return res.status(400).json({ error: 'Invalid repo format. Use owner/repo' });
+    }
+
+    console.log(`[GITHUB] Fallback route: Fetching issues for ${owner}/${repoName}`);
+
+    // Validate GitHub token
+    if (!process.env.GITHUB_TOKEN) {
+      return res.status(500).json({
+        error: 'GitHub token not configured',
+        message: 'GITHUB_TOKEN environment variable is required'
+      });
+    }
+
+    // Fetch issues from GitHub API using Octokit
+    const octokit = getOctokit();
+    const response = await octokit.rest.issues.listForRepo({
+      owner,
+      repo: repoName,
+      state: 'open',
+      per_page: 10,
+      sort: 'updated',
+      direction: 'desc'
+    });
+
+    // Transform the response to match expected format
+    const issues = response.data.map(issue => ({
+      id: issue.id,
+      number: issue.number,
+      title: issue.title,
+      body: issue.body || '',
+      state: issue.state,
+      labels: issue.labels.map(label => ({
+        name: label.name,
+        color: label.color,
+        description: label.description
+      })),
+      created_at: issue.created_at,
+      updated_at: issue.updated_at,
+      comments_count: issue.comments || 0,
+      user: {
+        login: issue.user.login,
+        avatar_url: issue.user.avatar_url
+      },
+      html_url: issue.html_url
+    }));
+
+    res.json({ issues });
+  } catch (err) {
+    console.error('[GITHUB] Issues fallback error:', err.response?.data || err.message);
+    if (err.status === 404) {
+      res.status(404).json({ error: 'Repository not found or not accessible' });
+    } else if (err.status === 401) {
+      res.status(401).json({ error: 'GitHub token invalid or insufficient permissions' });
+    } else {
+      res.status(500).json({ error: 'GitHub issues fetch failed' });
+    }
+  }
+});
+
 /**
  * GET /api/github/repos/:owner/:repo/issues
  * Fetch issues from a GitHub repository
