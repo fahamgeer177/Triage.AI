@@ -19,11 +19,49 @@ app.use(express.json({ limit: '10mb' }));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'healthy', 
+  try {
+    const healthData = {
+      status: 'healthy', 
+      agent: 'triage-agent',
+      version: '1.0.0',
+      timestamp: new Date().toISOString(),
+      environment: {
+        nodeVersion: process.version,
+        platform: process.platform,
+        uptime: process.uptime(),
+        memory: process.memoryUsage(),
+        port: PORT,
+        host: process.env.HOST || '0.0.0.0'
+      },
+      config: {
+        hasOpenAI: !!process.env.OPENAI_API_KEY,
+        nodeEnv: process.env.NODE_ENV || 'development'
+      }
+    };
+    
+    console.log(`[HEALTH] Health check requested - Status: healthy`);
+    res.status(200).json(healthData);
+  } catch (error) {
+    console.error('[HEALTH] Health check failed:', error);
+    res.status(500).json({
+      status: 'unhealthy',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Root endpoint for basic connectivity check
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Triage Agent is running',
     agent: 'triage-agent',
     version: '1.0.0',
-    timestamp: new Date().toISOString()
+    endpoints: {
+      health: '/health',
+      metadata: '/metadata', 
+      analyze: '/analyze'
+    }
   });
 });
 
@@ -155,11 +193,24 @@ app.use((error, req, res, next) => {
 });
 
 // Start the server
-app.listen(PORT, () => {
-  console.log(`🤖 Triage Agent running on port ${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/health`);
-  console.log(`📋 Metadata: http://localhost:${PORT}/metadata`);
-  console.log(`🔍 Analysis endpoint: http://localhost:${PORT}/analyze`);
+const HOST = process.env.HOST || '0.0.0.0';
+app.listen(PORT, HOST, () => {
+  console.log(`🤖 Triage Agent running on ${HOST}:${PORT}`);
+  console.log(`📊 Health check: http://${HOST}:${PORT}/health`);
+  console.log(`📋 Metadata: http://${HOST}:${PORT}/metadata`);
+  console.log(`🔍 Analysis endpoint: http://${HOST}:${PORT}/analyze`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('🛑 SIGTERM received, shutting down gracefully');
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('🛑 SIGINT received, shutting down gracefully');
+  process.exit(0);
 });
 
 module.exports = app;
