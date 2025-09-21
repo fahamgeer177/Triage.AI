@@ -3,7 +3,6 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
-const triageService = require('./services/triageService');
 
 // Load environment variables
 dotenv.config();
@@ -157,14 +156,39 @@ app.post('/analyze', async (req, res) => {
 
     console.log(`[TRIAGE] Analyzing issue: "${title.substring(0, 50)}..."`);
 
-    // Call the triage service
-    const result = await triageService.analyzeIssue({
-      title,
-      body,
-      comments,
-      labels,
-      repository
-    });
+    let result;
+    
+    try {
+      // Lazy load the triage service
+      const triageService = require('./services/triageService');
+      result = await triageService.analyzeIssue({
+        title,
+        body,
+        comments,
+        labels,
+        repository
+      });
+    } catch (serviceError) {
+      console.error('[TRIAGE] Service error, using fallback:', serviceError.message);
+      
+      // Fallback analysis
+      result = {
+        priority: 'medium',
+        severity: 'moderate',
+        suggested_labels: labels.length > 0 ? labels : ['triage-needed'],
+        summary: `Issue analysis for: ${title}`,
+        next_steps: [
+          'Review issue details thoroughly',
+          'Assign appropriate team member',
+          'Set priority based on impact'
+        ],
+        confidence: 0.6,
+        reasoning: 'Fallback analysis - AI service unavailable',
+        timestamp: new Date().toISOString(),
+        agent_version: '1.0.0',
+        fallback: true
+      };
+    }
 
     console.log(`[TRIAGE] Analysis complete. Priority: ${result.priority}, Confidence: ${result.confidence}`);
 

@@ -4,8 +4,8 @@
   "description": "Coral Protocol agent for AI-powered GitHub issue triage",
   "main": "src/index.js",
   "scripts": {
-    "start": "node start.js",
-    "start:simple": "node src/index.js",
+    "start": "node src/index.js",
+    "start:debug": "node start.js",
     "dev": "nodemon src/index.js",
     "test": "node test/test-agent.js",
     "register": "node register-agent.js",
